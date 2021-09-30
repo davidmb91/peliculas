@@ -14,6 +14,7 @@ class Peliculas {
 }
 
 class Pelicula {
+  String? uniqueId;
   bool? adult;
   String? backdropPath;
   List<int>? genreIds;
@@ -78,5 +79,4 @@ class Pelicula {
       return 'https://image.tmdb.org/t/p/w500/$backdropPath';
     }
   }
-
 }
