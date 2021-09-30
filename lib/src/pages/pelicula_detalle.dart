@@ -1,5 +1,9 @@
+// import 'dart:js';
+
 import 'package:flutter/material.dart';
+import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
+import 'package:peliculas/src/providers/peliculas_provider.dart';
 
 class PeliculaDetalle extends StatelessWidget {
   const PeliculaDetalle({Key? key}) : super(key: key);
@@ -24,6 +28,7 @@ class PeliculaDetalle extends StatelessWidget {
             _descripcion(pelicula),
             _descripcion(pelicula),
             _descripcion(pelicula),
+            _crearCasting(pelicula),
           ]),
         )
       ],
@@ -94,6 +99,55 @@ class PeliculaDetalle extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
       child: Text(pelicula.overview.toString(), textAlign: TextAlign.justify),
+    );
+  }
+
+  Widget _crearCasting(Pelicula pelicula) {
+    final peliculaProvider = new PeliculasProvider();
+
+    return FutureBuilder(
+      future: peliculaProvider.getCast(pelicula.id.toString()),
+      builder: (BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
+        if (snapshot.hasData) {
+          return _crearActoresPageView(snapshot.data!);
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+  Widget _crearActoresPageView(List<Actor> actores) {
+    return SizedBox(
+      height: 200.0,
+      child: PageView.builder(
+        pageSnapping: false,
+        itemCount: actores.length,
+        controller: PageController(viewportFraction: 0.3, initialPage: 1),
+        itemBuilder: (context, i) => _actorTarjeta(actores[i]),
+      ),
+    );
+  }
+
+  Widget _actorTarjeta(Actor actor) {
+    return Container(
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: FadeInImage(
+              image: NetworkImage(actor.getFoto()),
+              placeholder: AssetImage('assets/img/no-image.jpg'),
+              height: 150.0,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Text(
+            actor.name!,
+            overflow: TextOverflow.ellipsis,
+          )
+        ],
+      ),
     );
   }
 }
